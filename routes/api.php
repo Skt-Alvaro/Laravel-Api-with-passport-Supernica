@@ -22,8 +22,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::resource('user', UserController::class);
 
-Route::resource('products', ProductController::class);
-
 /////////PASSPORT/////////
 
 Route::post('users/register', [UserController::class, 'register']);

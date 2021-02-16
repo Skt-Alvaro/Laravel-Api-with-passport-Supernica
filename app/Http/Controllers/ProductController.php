@@ -20,35 +20,35 @@ class ProductController extends Controller
 
     public function store(Request $req)
     {
+        $productReq = new Product($req->all());
+
         if ($req->file('file') == null) {
             $req->file = "";
         } else {
             $image = $req->file('file')->store('public/images');
             $url = Storage::url($image);
-            $req->file = $url;
-            return $req->all();
+            $productReq->file = $url;
         }
 
-        // $rules = array(
-        //     'name' => 'required',
-        //     'price' => 'required',
-        //     'file' => 'required|image'
-        // );
-        // $validator = Validator::make($req->all(), $rules);
+        $rules = array(
+            'name' => 'required',
+            'price' => 'required',
+            'file' => 'required|image'
+        );
+        $validator = Validator::make($productReq, $rules);
 
-        // if ($validator->fails()) {
-        //     return response()->json([
-        //         'error' => true,
-        //         'response' => $validator->errors()
-        //     ], 401);
-        // } else {
-        //     $product = Product::create($req->all());
-        //     return response()->json([
-        //         'error' => false,
-        //         'response' => $product,
-        //         'si' => $req->all()
-        //     ], 200);
-        // }
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'response' => $validator->errors()
+            ], 401);
+        } else {
+            $product = Product::create($productReq);
+            return response()->json([
+                'error' => false,
+                'response' => $product,
+            ], 200);
+        }
     }
 
     public function show(Product $product)
