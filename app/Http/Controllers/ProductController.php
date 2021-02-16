@@ -5,56 +5,79 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     public function index()
     {
         $products = Product::all();
-        return response()->json($products, 200);
+        return response()->json([
+            'error' => false,
+            'response' => $products
+        ], 200);
     }
 
     public function store(Request $req)
     {
-        $rules = array(
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required|int'
-        );
-        $validator = Validator::make($req->all(), $rules);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(), 401);
+        if ($req->file('file') == null) {
+            $req->file = "";
         } else {
-            $product = Product::create($req->all());
-            return response()->json([
-                'response' => 'Producto creado con éxito',
-                'product' => $product
-            ], 200);
+            $image = $req->file('file')->store('public/images');
+            $url = Storage::url($image);
+            $req->file = $url;
+            return $req->all();
         }
+
+        // $rules = array(
+        //     'name' => 'required',
+        //     'price' => 'required',
+        //     'file' => 'required|image'
+        // );
+        // $validator = Validator::make($req->all(), $rules);
+
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'error' => true,
+        //         'response' => $validator->errors()
+        //     ], 401);
+        // } else {
+        //     $product = Product::create($req->all());
+        //     return response()->json([
+        //         'error' => false,
+        //         'response' => $product,
+        //         'si' => $req->all()
+        //     ], 200);
+        // }
     }
 
     public function show(Product $product)
     {
-        return response()->json($product, 200);
+        return response()->json([
+            'error' => true,
+            'response' => $product
+        ], 200);
     }
 
     public function update(Request $req, Product $product)
     {
         $rules = array(
             'name' => 'required',
-            'description' => 'required',
-            'price' => 'required|int'
+            'price' => 'required',
+            'image' => 'required|image'
         );
         $validator = Validator::make($req->all(), $rules);
 
-        if($validator->fails()){
-            return response()->json($validator->errors(), 401);
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'response' => $validator->errors()
+            ], 401);
         } else {
             $new_product = $product->update($req->all());
             return response()->json([
-                'response' => 'Producto actualizado con éxito',
-                'product' => $product
+                'error' => false,
+                'response' => $product,
             ], 200);
         }
     }
@@ -64,8 +87,8 @@ class ProductController extends Controller
         $si = $product;
         $product->delete();
         return response()->json([
-            'response'=>'Producto eliminado con éxito',
-            'producto eliminado' => $si
+            'error' => false,
+            'response' => $si
         ], 200);
     }
 }
