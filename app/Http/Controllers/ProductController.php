@@ -20,41 +20,43 @@ class ProductController extends Controller
 
     public function store(Request $req)
     {
-        $productReq = new Product($req->all());
-
-        if ($req->file('file') == null) {
-            $req->file = "";
-        } else {
-            $image = $req->file('file')->store('public/images');
-            $url = Storage::url($image);
-            $productReq->file = $url;
-        }
-
         $rules = array(
             'name' => 'required',
             'price' => 'required',
             'file' => 'required|image'
         );
-        $validator = Validator::make($productReq, $rules);
+
+        $validator = Validator::make($req->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
                 'error' => true,
                 'response' => $validator->errors()
             ], 401);
-        } else {
-            $product = Product::create($productReq);
-            return response()->json([
-                'error' => false,
-                'response' => $product,
-            ], 200);
         }
+
+        $product = new Product($req->input());
+
+        if ($req->file('file') == null) {
+            $req->file = "";
+        } else {
+            $image = $req->file('file')->store('public/images');
+            $url = Storage::url($image);
+            $product->file = $url;
+        }
+
+        $product->save();
+
+        return response()->json([
+            'error' => false,
+            'response' => $product,
+        ], 200);
     }
 
     public function show(Product $product)
     {
         return response()->json([
-            'error' => true,
+            'error' => false,
             'response' => $product
         ], 200);
     }

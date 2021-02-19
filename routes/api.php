@@ -30,7 +30,7 @@ Route::post('users/login', [UserController::class, 'login']);
 
 Route::get('users/login', [UserController::class, 'login'])->name('login');
 
-Route::middleware('auth:api')->resource('products', ProductController::class);
+Route::resource('products', ProductController::class);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('users/logout', [UserController::class, 'logout']);
