@@ -141,4 +141,20 @@ class UserController extends Controller
             'response' => 'Usuario eliminado con éxito'
         ], 200);
     }
+
+    public function getUserByToken()
+    {
+        $user = Auth::guard('api')->user();
+        if ($user) {
+            $data = [
+                'error' => false,
+                'user' => $user
+            ];
+            return response()->json($data, 200);
+        }
+        return response()->json([
+            'error' => true,
+            'response' => 'Invalid token'
+        ], 404);
+    }
 }

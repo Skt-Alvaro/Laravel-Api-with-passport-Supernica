@@ -66,7 +66,7 @@ class ProductController extends Controller
         $rules = array(
             'name' => 'required',
             'price' => 'required',
-            'image' => 'required|image'
+            'file' => 'required|image'
         );
         $validator = Validator::make($req->all(), $rules);
 

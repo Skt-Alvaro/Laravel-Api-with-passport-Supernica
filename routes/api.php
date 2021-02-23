@@ -30,6 +30,8 @@ Route::post('users/login', [UserController::class, 'login']);
 
 Route::get('users/login', [UserController::class, 'login'])->name('login');
 
+Route::get('users/get-user-by-token', [UserController::class, 'getUserByToken']);
+
 Route::resource('products', ProductController::class);
 
 Route::middleware('auth:api')->group(function () {
